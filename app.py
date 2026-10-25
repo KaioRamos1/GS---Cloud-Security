@@ -1,4 +1,4 @@
-"""Minha Frota: API WSGI e SQLite. Adaptada do material de Eduardo Popovici.
+"""Kaio Automóveis: API WSGI e SQLite. Adaptada do material de Eduardo Popovici.
 
 Local: python app.py --seed. Azure: Gunicorn app:application, atrás de Nginx.
 """
@@ -161,7 +161,8 @@ def route(env):
         invalid('Quantidade excessiva de parametros.')
     assets = {'/': ('dashboard.html', 'text/html; charset=utf-8'),
               '/static/app.js': ('static/app.js', 'text/javascript; charset=utf-8'),
-              '/static/style.css': ('static/style.css', 'text/css; charset=utf-8')}
+              '/static/style.css': ('static/style.css', 'text/css; charset=utf-8'),
+              '/static/kaio-hero.png': ('static/kaio-hero.png', 'image/png')}
     if path in assets:
         if method != 'GET':
             raise ApiError(405, 'method_not_allowed', 'Use GET.')

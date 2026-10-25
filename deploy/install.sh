@@ -19,7 +19,7 @@ apt-get install -y python3-venv nginx certbot apache2-utils
 id minhafrota >/dev/null 2>&1 || useradd --system --user-group --home-dir /var/lib/minhafrota --shell /usr/sbin/nologin minhafrota
 install -d -m 0755 /opt/minhafrota /opt/minhafrota/static /var/www/letsencrypt
 install -m 0644 app.py schema.sql dashboard.html requirements.txt /opt/minhafrota/
-install -m 0644 static/app.js static/style.css /opt/minhafrota/static/
+install -m 0644 static/app.js static/style.css static/kaio-hero.png /opt/minhafrota/static/
 python3 -m venv /opt/minhafrota/.venv
 /opt/minhafrota/.venv/bin/python -m pip install -r /opt/minhafrota/requirements.txt
 install -m 0644 deploy/minhafrota.service /etc/systemd/system/minhafrota.service
