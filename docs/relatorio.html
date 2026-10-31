@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Cloud Security Prevention e DevSecOps</title>
+<style>
+  @page { size: A4; margin: 3cm 2cm 2cm 3cm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+    line-height: 1.5;
+    color: #000;
+    text-align: justify;
+    margin: 0;
+  }
+  p { text-indent: 1.25cm; margin: 0 0 6pt 0; }
+  p.noindent { text-indent: 0; }
+  h2 {
+    font-size: 13pt;
+    font-weight: bold;
+    text-align: left;
+    margin: 14pt 0 6pt 0;
+    page-break-after: avoid;
+  }
+  ul, ol { margin: 4pt 0 6pt 0; padding-left: 1.6cm; }
+  li { margin-bottom: 2pt; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 10pt 0 4pt 0;
+    font-size: 11pt;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #000;
+    padding: 3pt 6pt;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: #e8eef7; font-weight: bold; }
+  .tabcaption, .figcaption {
+    text-align: center;
+    font-size: 10pt;
+    margin: 3pt 0 10pt 0;
+    page-break-inside: avoid;
+  }
+  .figcaption { margin-top: 6pt; }
+  figure { margin: 6pt 0 0 0; text-align: center; page-break-inside: avoid; }
+  figure img { max-width: 100%; max-height: 5cm; }
+  .sumario td { border: none; padding: 2pt 0; }
+  .sumario .pg { text-align: right; width: 3cm; }
+  pre {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 8.5pt;
+    background: #f4f4f4;
+    border: 1px solid #ccc;
+    padding: 6pt 8pt;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 6pt 0 10pt 0;
+    line-height: 1.15;
+    page-break-inside: avoid;
+  }
+  code { font-family: "Courier New", Courier, monospace; font-size: 10pt; }
+  .capa { text-align: center; page-break-after: always; }
+  .capa .inst { font-size: 13pt; font-weight: bold; margin-top: 0; text-indent: 0; }
+  .capa .autor { font-size: 12pt; font-weight: bold; margin-top: 2.5cm; text-indent: 0; }
+  .capa .titulo { font-size: 16pt; font-weight: bold; margin: 4cm 2cm 0 2cm; line-height: 1.4; text-indent: 0; }
+  .capa .sub { font-size: 12pt; margin: 1cm 2.5cm 0 2.5cm; line-height: 1.4; text-indent: 0; }
+  .capa .trabalho { margin-top: 3.2cm; font-size: 12pt; line-height: 1.5; text-indent: 0; }
+  .capa .cidade { margin-top: 3cm; font-size: 12pt; text-indent: 0; line-height: 1.5; }
+  .svgbox { text-align: center; margin: 10pt 0 0 0; page-break-inside: avoid; }
+  .secao { page-break-inside: auto; }
+</style>
+</head>
+<body>
+
+<div class="capa">
+  <p class="inst">FIAP<br>Faculdade de Informática e Administração Paulista</p>
+  <p class="autor">Kaior Ramos Rodrigues Barreto<br>RM 567697</p>
+  <p class="titulo">CLOUD SECURITY PREVENTION<br>E DEVSECOPS</p>
+  <p class="sub">Minhas Tarefas: API REST com banco de dados SQLite<br>hospedada em máquina virtual Azure, de ponta a ponta</p>
+  <p class="trabalho">Trabalho acadêmico (GS)<br>Computação em Nuvem<br>Professor: Eduardo Popovici</p>
+  <p class="cidade">São Paulo<br>Outubro de 2026</p>
+</div>
+
+<div class="secao" style="page-break-after: always;">
+<h2>RESUMO</h2>
+<p class="noindent">Este trabalho desenvolve e hospeda, de ponta a ponta em nuvem pública, uma API REST com banco de dados SQLite, aplicando práticas de prevenção e segurança em nuvem (cloud security prevention) e de integração da segurança ao processo de desenvolvimento e operação (DevSecOps). A API, escrita em TypeScript e executada pelo runtime Bun, oferece operações CRUD completas, com validação de entrada, exclusão protegida por confirmação e dashboard de acompanhamento, e conta com 19 testes automatizados aprovados. A hospedagem em máquina virtual Azure (SKU Standard_B2ats_v2, região Chile Central) segue princípios de prevenção: superfície de rede mínima com NSG, autenticação SSH por chave, execução do serviço sem privilégios de root e persistência do banco de dados fora do código. Todo o provisionamento foi automatizado em script único, versionado junto com o código, os testes, as evidências e este relatório em repositório GitHub público. Os resultados comprovam a API em produção, acessível pela internet e validada de fora da nuvem.</p>
+<p class="noindent"><b>Palavras-chave:</b> computação em nuvem; segurança em nuvem; DevSecOps; API REST; SQLite; Microsoft Azure.</p>
+</div>
+
+<div class="secao" style="page-break-after: always;">
+<h2>SUMÁRIO</h2>
+<table class="sumario">
+  <tr><td>1 INTRODUÇÃO</td><td class="pg" id="pg-1">4</td></tr>
+  <tr><td>2 OBJETIVOS</td><td class="pg" id="pg-2">4</td></tr>
+  <tr><td>3 ARQUITETURA DA SOLUÇÃO</td><td class="pg" id="pg-3">4</td></tr>
+  <tr><td>4 TECNOLOGIAS UTILIZADAS</td><td class="pg" id="pg-4">5</td></tr>
+  <tr><td>5 MODELO DE DADOS</td><td class="pg" id="pg-5">6</td></tr>
+  <tr><td>6 A API REST</td><td class="pg" id="pg-6">7</td></tr>
+  <tr><td>7 ELEMENTOS DE COMPUTAÇÃO EM NUVEM</td><td class="pg" id="pg-7">9</td></tr>
+  <tr><td>8 HOSPEDAGEM DE FIM A FIM: PASSO A PASSO</td><td class="pg" id="pg-8">12</td></tr>
+  <tr><td>9 OPERAÇÃO EM PRODUÇÃO</td><td class="pg" id="pg-9">13</td></tr>
+  <tr><td>10 EVIDÊNCIAS DOS ELEMENTOS DE NUVEM NO PORTAL</td><td class="pg" id="pg-10">13</td></tr>
+  <tr><td>11 TESTES AUTOMATIZADOS</td><td class="pg" id="pg-11">14</td></tr>
+  <tr><td>12 PROBLEMAS ENFRENTADOS E RESOLUÇÃO (TROUBLESHOOTING)</td><td class="pg" id="pg-12">15</td></tr>
+  <tr><td>13 CONCLUSÃO</td><td class="pg" id="pg-13">15</td></tr>
+  <tr><td>REFERÊNCIAS</td><td class="pg" id="pg-14">16</td></tr>
+</table>
+</div>
+
+<div class="secao">
+<h2>1 INTRODUÇÃO</h2>
+<p>Este trabalho apresenta o desenvolvimento e a hospedagem de uma API REST completa, com banco de dados SQLite, em uma máquina virtual do Microsoft Azure, abrangendo todo o ciclo: modelagem de dados, implementação, testes automatizados, provisionamento de infraestrutura em nuvem, publicação e validação de ponta a ponta pela internet.</p>
+<p>A aplicação, batizada de <b>Minhas Tarefas</b>, é um gerenciador de tarefas com operações CRUD completas, validação de dados, exclusão protegida por confirmação e dashboard de indicadores. Inspirado no material didático da disciplina, o repositório <i>minha-frota</i> (POPOVICI), que demonstra uma API local em Python com SQLite, este trabalho segue a mesma filosofia de simplicidade e a estende ao cenário real de nuvem, com a API publicada em uma VM Azure acessível de qualquer lugar do mundo.</p>
+<p>Todos os artefatos do trabalho estão versionados em repositório público no GitHub, incluindo o código-fonte, os testes, os scripts de provisionamento, as evidências em forma de capturas de tela e esta documentação em PDF.</p>
+</div>
+
+<div class="secao">
+<h2>2 OBJETIVOS</h2>
+<p class="noindent">Os objetivos do trabalho, conforme os requisitos propostos, são:</p>
+<ul>
+  <li>Desenvolver uma API básica com banco de dados SQLite, com operações CRUD e validação de dados;</li>
+  <li>Hospedar a aplicação de fim a fim em nuvem pública, por meio de uma máquina virtual Azure com endereço IP público;</li>
+  <li>Versionar e compartilhar todo o projeto em repositório GitHub;</li>
+  <li>Produzir documentação completa com esquemas visuais (arquitetura, modelo de dados e fluxo de requisições) e relatório detalhado em PDF;</li>
+  <li>Registrar as evidências por meio de capturas de tela do portal Azure, da aplicação em funcionamento e dos testes;</li>
+  <li>Explicar os elementos de nuvem utilizados: computação (VM e SKU), armazenamento (disco gerenciado e banco SQLite), rede (VNet, NSG e IP público) e a linguagem de programação escolhida.</li>
+</ul>
+</div>
+
+<div class="secao">
+<h2>3 ARQUITETURA DA SOLUÇÃO</h2>
+<p>A arquitetura adotada é a mais simples possível que ainda atende ao requisito de hospedagem real: uma única máquina virtual IaaS na nuvem executando a aplicação com o banco de dados no mesmo disco. Não há balanceadores, filas ou microsserviços; a simplicidade é deliberada e adequada à escala do problema.</p>
+<p>O cliente (navegador ou ferramenta de linha de comando) acessa a API pela internet na porta 80. O Grupo de Segurança de Rede (NSG) filtra o tráfego, permitindo apenas as portas 80 (HTTP) e 22 (SSH). Dentro da VM, o <i>systemd</i> mantém o processo da API sempre ativo, o runtime Bun executa a aplicação escrita em TypeScript e o banco SQLite persiste as tarefas em arquivo no disco gerenciado, fora do diretório do código.</p>
+<div class="svgbox">
+<svg width="540" height="270" viewBox="0 0 660 330" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">
+  <rect x="20" y="90" width="130" height="80" fill="#eaf2fb" stroke="#4a90d9" stroke-width="1.5" rx="6"/>
+  <text x="85" y="120" text-anchor="middle" font-size="12" font-weight="bold" fill="#102a4c">Cliente</text>
+  <text x="85" y="138" text-anchor="middle" font-size="11" fill="#333">Navegador</text>
+  <text x="85" y="153" text-anchor="middle" font-size="11" fill="#333">ou curl</text>
+  <line x1="150" y1="130" x2="218" y2="130" stroke="#4a90d9" stroke-width="2"/>
+  <polygon points="218,130 208,124 208,136" fill="#4a90d9"/>
+  <text x="184" y="120" text-anchor="middle" font-size="10" fill="#555">HTTP</text>
+  <text x="184" y="147" text-anchor="middle" font-size="10" fill="#555">Internet</text>
+  <rect x="220" y="90" width="120" height="80" fill="#fdf3e3" stroke="#d9920d" stroke-width="1.5" rx="6"/>
+  <text x="280" y="115" text-anchor="middle" font-size="12" font-weight="bold" fill="#7a5300">NSG</text>
+  <text x="280" y="133" text-anchor="middle" font-size="10" fill="#333">Porta 80 (HTTP)</text>
+  <text x="280" y="148" text-anchor="middle" font-size="10" fill="#333">Porta 22 (SSH)</text>
+  <line x1="340" y1="130" x2="408" y2="130" stroke="#4a90d9" stroke-width="2"/>
+  <polygon points="408,130 398,124 398,136" fill="#4a90d9"/>
+  <text x="374" y="120" text-anchor="middle" font-size="10" fill="#555">IP público</text>
+  <text x="374" y="147" text-anchor="middle" font-size="10" fill="#555">57.156.68.206</text>
+  <rect x="410" y="20" width="230" height="290" fill="#f7fafd" stroke="#102a4c" stroke-width="2" rx="8"/>
+  <rect x="410" y="20" width="230" height="42" fill="#102a4c" rx="8"/>
+  <rect x="410" y="46" width="230" height="16" fill="#102a4c"/>
+  <text x="525" y="47" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">VM Azure · Chile Central</text>
+  <rect x="425" y="74" width="200" height="34" fill="#eaf2fb" stroke="#4a90d9" rx="5"/>
+  <text x="525" y="95" text-anchor="middle" font-size="11" fill="#102a4c">SKU B2ats_v2 · 2 vCPU · 1 GiB</text>
+  <rect x="425" y="116" width="200" height="34" fill="#e8f5ea" stroke="#2e8b57" rx="5"/>
+  <text x="525" y="137" text-anchor="middle" font-size="11" fill="#1d5c36">systemd: minhas-tarefas.service</text>
+  <rect x="425" y="158" width="200" height="34" fill="#f3e8fb" stroke="#8b4ad9" rx="5"/>
+  <text x="525" y="179" text-anchor="middle" font-size="11" fill="#4a1d7a">Bun · runtime TypeScript</text>
+  <rect x="425" y="200" width="200" height="34" fill="#eaf2fb" stroke="#4a90d9" rx="5"/>
+  <text x="525" y="221" text-anchor="middle" font-size="11" fill="#102a4c">API REST · Bun.serve() :80</text>
+  <rect x="425" y="242" width="200" height="34" fill="#fdf3e3" stroke="#d9920d" rx="5"/>
+  <text x="525" y="263" text-anchor="middle" font-size="11" fill="#7a5300">SQLite · bun:sqlite</text>
+  <line x1="525" y1="276" x2="525" y2="292" stroke="#666" stroke-width="2"/>
+  <text x="525" y="306" text-anchor="middle" font-size="10" fill="#333">Disco gerenciado SSD 30 GB</text>
+  <text x="85" y="210" text-anchor="middle" font-size="10" fill="#555">Ubuntu Server 24.04 LTS</text>
+  <text x="85" y="226" text-anchor="middle" font-size="10" fill="#555">Banco em /var/lib/minhas-tarefas/</text>
+  <text x="85" y="242" text-anchor="middle" font-size="10" fill="#555">Restart automático do serviço</text>
+</svg>
+</div>
+<p class="figcaption"><b>Figura 1</b>. Arquitetura da solução, do cliente até o banco de dados na VM Azure.</p>
+</div>
+<div class="secao">
+<h2>4 TECNOLOGIAS UTILIZADAS</h2>
+<p class="noindent">As tecnologias escolhidas priorizam simplicidade, modernidade e ausência de dependências externas de execução:</p>
+<table>
+  <tr><th style="width:20%">Tecnologia</th><th style="width:18%">Papel</th><th>Justificativa</th></tr>
+  <tr><td>TypeScript</td><td>Linguagem</td><td>Linguagem de programação utilizada no trabalho; a tipagem estática reduz erros durante o desenvolvimento e é amplamente adotada no mercado.</td></tr>
+  <tr><td>Bun 1.4</td><td>Runtime</td><td>Runtime moderno que executa TypeScript nativamente, sem etapa de compilação, com servidor HTTP e cliente SQLite embutidos, de modo que o projeto não tem nenhuma dependência de execução.</td></tr>
+  <tr><td>Bun.serve()</td><td>Servidor HTTP</td><td>Servidor web nativo do Bun, no lugar de frameworks como Express; mantém o código enxuto e o empacotamento trivial para a VM.</td></tr>
+  <tr><td>SQLite (bun:sqlite)</td><td>Banco de dados</td><td>Banco relacional embutido em um único arquivo, requisitado no trabalho; o driver faz parte do runtime, sem instalação de servidor de banco separado.</td></tr>
+  <tr><td>systemd</td><td>Gerenciamento do serviço</td><td>Inicializa a API junto com o boot da VM, reinicia o processo em caso de falha e roda na porta 80 sem privilégios de root.</td></tr>
+  <tr><td>Microsoft Azure</td><td>Nuvem pública</td><td>Provedor utilizado para hospedar a API de fim a fim, com assinatura Azure for Students.</td></tr>
+</table>
+<p class="tabcaption"><b>Tabela 1</b>. Tecnologias utilizadas e suas justificativas.</p>
+<p>Em relação ao material didático de referência, escrito em Python puro com biblioteca padrão e executado apenas localmente, a escolha do TypeScript com Bun segue a mesma filosofia (uma API sem dependências externas), agregando os elementos de nuvem exigidos: máquina virtual, disco gerenciado, rede e IP público.</p>
+</div>
+
+<div class="secao">
+<h2>5 MODELO DE DADOS</h2>
+<p>O banco de dados possui uma única tabela, <code>tasks</code>, criada automaticamente no primeiro início da aplicação. Além da chave primária e dos campos de negócio (título, descrição, situação, prioridade e prazo), o esquema define restrições de integridade no próprio SQLite: a situação e a prioridade só aceitam valores pré-definidos (constraints <code>CHECK</code>), o título não pode ser vazio e há um índice para acelerar consultas por situação.</p>
+<pre>CREATE TABLE IF NOT EXISTS tasks (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  title       TEXT NOT NULL CHECK(length(trim(title)) > 0),
+  description TEXT,
+  status      TEXT NOT NULL DEFAULT 'pendente'
+              CHECK(status IN ('pendente','concluida','cancelada')),
+  priority    TEXT NOT NULL DEFAULT 'media'
+              CHECK(priority IN ('baixa','media','alta')),
+  due_date    TEXT,
+  created_at  TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at  TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);</pre>
+<div class="svgbox">
+<svg width="540" height="245" viewBox="0 0 660 300" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">
+  <rect x="60" y="30" width="290" height="242" fill="#fff" stroke="#102a4c" stroke-width="2"/>
+  <rect x="60" y="30" width="290" height="34" fill="#102a4c"/>
+  <text x="205" y="52" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">tasks</text>
+  <text x="75" y="82" font-size="11" fill="#000">id</text>
+  <text x="135" y="82" font-size="11" fill="#555">INTEGER PK</text>
+  <text x="250" y="82" font-size="10" fill="#777">autoincrement</text>
+  <line x1="60" y1="90" x2="350" y2="90" stroke="#ccc"/>
+  <text x="75" y="108" font-size="11" fill="#000">title</text>
+  <text x="135" y="108" font-size="11" fill="#555">TEXT NOT NULL</text>
+  <text x="250" y="108" font-size="10" fill="#777">máx. 200 caracteres</text>
+  <line x1="60" y1="116" x2="350" y2="116" stroke="#e8e8e8"/>
+  <text x="75" y="134" font-size="11" fill="#000">description</text>
+  <text x="135" y="134" font-size="11" fill="#555">TEXT</text>
+  <text x="250" y="134" font-size="10" fill="#777">opcional, máx. 2000</text>
+  <line x1="60" y1="142" x2="350" y2="142" stroke="#e8e8e8"/>
+  <text x="75" y="160" font-size="11" fill="#000">status</text>
+  <text x="135" y="160" font-size="11" fill="#555">TEXT</text>
+  <text x="250" y="160" font-size="10" fill="#777">pendente | concluida | cancelada</text>
+  <line x1="60" y1="168" x2="350" y2="168" stroke="#e8e8e8"/>
+  <text x="75" y="186" font-size="11" fill="#000">priority</text>
+  <text x="135" y="186" font-size="11" fill="#555">TEXT</text>
+  <text x="250" y="186" font-size="10" fill="#777">baixa | media | alta</text>
+  <line x1="60" y1="194" x2="350" y2="194" stroke="#e8e8e8"/>
+  <text x="75" y="212" font-size="11" fill="#000">due_date</text>
+  <text x="135" y="212" font-size="11" fill="#555">TEXT</text>
+  <text x="250" y="212" font-size="10" fill="#777">formato AAAA-MM-DD</text>
+  <line x1="60" y1="220" x2="350" y2="220" stroke="#e8e8e8"/>
+  <text x="75" y="238" font-size="11" fill="#000">created_at</text>
+  <text x="135" y="238" font-size="11" fill="#555">TEXT</text>
+  <text x="250" y="238" font-size="10" fill="#777">timestamp automático</text>
+  <line x1="60" y1="246" x2="350" y2="246" stroke="#e8e8e8"/>
+  <text x="75" y="264" font-size="11" fill="#000">updated_at</text>
+  <text x="135" y="264" font-size="11" fill="#555">TEXT</text>
+  <text x="250" y="264" font-size="10" fill="#777">atualizado em cada PUT</text>
+  <rect x="400" y="80" width="215" height="150" fill="#fdf7e8" stroke="#d9920d" stroke-width="1.5" rx="6"/>
+  <text x="507" y="105" text-anchor="middle" font-size="12" font-weight="bold" fill="#7a5300">Integridade garantida</text>
+  <text x="415" y="128" font-size="10.5" fill="#333">• CHECK impede status inválido</text>
+  <text x="415" y="148" font-size="10.5" fill="#333">• CHECK impede prioridade inválida</text>
+  <text x="415" y="168" font-size="10.5" fill="#333">• title nunca pode ser vazio</text>
+  <text x="415" y="188" font-size="10.5" fill="#333">• Índice por status acelera filtros</text>
+  <text x="415" y="208" font-size="10.5" fill="#333">• Datas em AAAA-MM-DD validadas</text>
+</svg>
+</div>
+<p class="figcaption"><b>Figura 2</b>. Modelo de dados (entidade <i>tasks</i>) com restrições de integridade.</p>
+<p>No primeiro início, a aplicação semeia automaticamente três tarefas de demonstração, o que facilita os primeiros testes da API e a validação visual do dashboard, comportamento inspirado no material didático de referência.</p>
+</div>
+<div class="secao">
+<h2>6 A API REST</h2>
+<p>A API expõe as operações CRUD sobre o recurso <code>tasks</code>, além de um verificador de saúde (<i>health check</i>), um painel de indicadores e a interface web. Todas as respostas seguem um padrão único: sucessos no envelope <code>{"data": ...}</code> e erros em <code>{"error": {"code": ..., "message": ...}}</code>.</p>
+<table>
+  <tr><th style="width:12%">Método</th><th style="width:26%">Rota</th><th>Descrição</th></tr>
+  <tr><td>GET</td><td>/</td><td>Interface web (dashboard HTML) com indicadores e lista de tarefas.</td></tr>
+  <tr><td>GET</td><td>/api/health</td><td>Status da API, caminho do banco e host, usado para monitoramento.</td></tr>
+  <tr><td>GET</td><td>/api/tasks</td><td>Lista todas as tarefas; aceita filtro opcional <code>?status=</code>.</td></tr>
+  <tr><td>POST</td><td>/api/tasks</td><td>Cria uma tarefa com validação de campos; responde 201 com o registro criado.</td></tr>
+  <tr><td>GET</td><td>/api/tasks/{id}</td><td>Detalha uma tarefa; 404 se não existir.</td></tr>
+  <tr><td>PUT</td><td>/api/tasks/{id}</td><td>Atualização parcial com lista branca de campos; atualiza <code>updated_at</code>.</td></tr>
+  <tr><td>DELETE</td><td>/api/tasks/{id}</td><td>Exclui a tarefa, <b>exigindo confirmação</b> <code>?confirm=true</code>; sem ela, responde 409.</td></tr>
+  <tr><td>GET</td><td>/api/dashboard</td><td>Contadores agregados: total, pendentes, concluídas e canceladas.</td></tr>
+</table>
+<p class="tabcaption"><b>Tabela 2</b>. Rotas da API REST.</p>
+<p>A exclusão exige confirmação explícita por parâmetro de consulta, comportamento que previne remoções acidentais por chamadas equivocadas: se o cliente tentar excluir sem <code>?confirm=true</code>, a API responde <code>409 Conflict</code> com o código <code>confirmation_required</code> e a tarefa permanece intacta.</p>
+<div class="svgbox">
+<svg width="540" height="327" viewBox="0 0 660 400" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">
+  <rect x="55" y="20" width="110" height="34" fill="#eaf2fb" stroke="#4a90d9" stroke-width="1.5" rx="6"/>
+  <text x="110" y="41" text-anchor="middle" font-size="12" font-weight="bold" fill="#102a4c">Cliente</text>
+  <rect x="270" y="20" width="120" height="34" fill="#eaf2fb" stroke="#4a90d9" stroke-width="1.5" rx="6"/>
+  <text x="330" y="41" text-anchor="middle" font-size="12" font-weight="bold" fill="#102a4c">API (Bun.serve)</text>
+  <rect x="495" y="20" width="110" height="34" fill="#fdf3e3" stroke="#d9920d" stroke-width="1.5" rx="6"/>
+  <text x="550" y="41" text-anchor="middle" font-size="12" font-weight="bold" fill="#7a5300">SQLite</text>
+  <line x1="110" y1="54" x2="110" y2="380" stroke="#999" stroke-dasharray="5,4"/>
+  <line x1="330" y1="54" x2="330" y2="380" stroke="#999" stroke-dasharray="5,4"/>
+  <line x1="550" y1="54" x2="550" y2="380" stroke="#999" stroke-dasharray="5,4"/>
+  <line x1="110" y1="85" x2="330" y2="85" stroke="#4a90d9" stroke-width="1.6"/>
+  <polygon points="330,85 320,80 320,90" fill="#4a90d9"/>
+  <text x="220" y="78" text-anchor="middle" font-size="10.5" fill="#102a4c">POST /api/tasks {"title": "Comprar café"}</text>
+  <rect x="285" y="100" width="90" height="24" fill="#f3e8fb" stroke="#8b4ad9" rx="4"/>
+  <text x="330" y="116" text-anchor="middle" font-size="10" fill="#4a1d7a">valida campos</text>
+  <line x1="330" y1="140" x2="550" y2="140" stroke="#4a90d9" stroke-width="1.6"/>
+  <polygon points="550,140 540,135 540,145" fill="#4a90d9"/>
+  <text x="440" y="133" text-anchor="middle" font-size="10.5" fill="#102a4c">INSERT INTO tasks (...)</text>
+  <line x1="550" y1="168" x2="330" y2="168" stroke="#2e8b57" stroke-width="1.6" stroke-dasharray="6,3"/>
+  <polygon points="330,168 340,163 340,173" fill="#2e8b57"/>
+  <text x="440" y="161" text-anchor="middle" font-size="10.5" fill="#1d5c36">novo id = 4</text>
+  <line x1="330" y1="198" x2="110" y2="198" stroke="#2e8b57" stroke-width="1.6" stroke-dasharray="6,3"/>
+  <polygon points="110,198 120,193 120,203" fill="#2e8b57"/>
+  <text x="220" y="191" text-anchor="middle" font-size="10.5" fill="#1d5c36">201 Created + JSON da tarefa</text>
+  <line x1="110" y1="240" x2="330" y2="240" stroke="#b42318" stroke-width="1.6"/>
+  <polygon points="330,240 320,235 320,245" fill="#b42318"/>
+  <text x="220" y="233" text-anchor="middle" font-size="10.5" fill="#7a1010">DELETE /api/tasks/3 (sem confirmação)</text>
+  <line x1="330" y1="268" x2="110" y2="268" stroke="#b42318" stroke-width="1.6" stroke-dasharray="6,3"/>
+  <polygon points="110,268 120,263 120,273" fill="#b42318"/>
+  <text x="220" y="261" text-anchor="middle" font-size="10.5" fill="#7a1010">409 · confirmação exigida</text>
+  <line x1="110" y1="310" x2="330" y2="310" stroke="#4a90d9" stroke-width="1.6"/>
+  <polygon points="330,310 320,305 320,315" fill="#4a90d9"/>
+  <text x="220" y="303" text-anchor="middle" font-size="10.5" fill="#102a4c">DELETE /api/tasks/3?confirm=true</text>
+  <line x1="330" y1="338" x2="550" y2="338" stroke="#4a90d9" stroke-width="1.6"/>
+  <polygon points="550,338 540,333 540,343" fill="#4a90d9"/>
+  <text x="440" y="331" text-anchor="middle" font-size="10.5" fill="#102a4c">DELETE FROM tasks WHERE id = 3</text>
+  <line x1="330" y1="370" x2="110" y2="370" stroke="#2e8b57" stroke-width="1.6" stroke-dasharray="6,3"/>
+  <polygon points="110,370 120,365 120,375" fill="#2e8b57"/>
+  <text x="220" y="363" text-anchor="middle" font-size="10.5" fill="#1d5c36">204 No Content</text>
+</svg>
+</div>
+<p class="figcaption"><b>Figura 3</b>. Fluxo de requisições: criação validada e exclusão protegida por confirmação.</p>
+<p class="noindent">A seguir, exemplos reais capturados durante a validação em produção, contra o endereço público da VM:</p>
+<pre>$ curl -s -X POST http://57.156.68.206/api/tasks \
+    -H "Content-Type: application/json" \
+    -d '{"title":"Validar API em producao","priority":"alta","due_date":"2026-11-30"}'
+
+{"data":{"id":4,"title":"Validar API em producao",
+  "description":"Teste fim a fim via internet","status":"pendente",
+  "priority":"alta","due_date":"2026-11-30",
+  "created_at":"2026-10-31 19:44:53","updated_at":"2026-10-31 19:44:53"}}
+
+$ curl -s -X DELETE http://57.156.68.206/api/tasks/3
+
+{"error":{"code":"confirmation_required",
+  "message":"Confirme a exclusão com ?confirm=true."}}
+
+$ curl -s http://57.156.68.206/api/dashboard
+
+{"data":{"total":4,"pendentes":2,"concluidas":2,"canceladas":0}}</pre>
+</div>
+<div class="secao">
+<h2>7 ELEMENTOS DE COMPUTAÇÃO EM NUVEM</h2>
+<p>Esta seção explica cada elemento de nuvem provisionado no trabalho, conforme os requisitos: computação (máquina virtual e seu SKU), armazenamento, rede, região e a linguagem de programação utilizada.</p>
+<table>
+  <tr><th style="width:20%">Elemento</th><th style="width:44%">Especificação</th><th>Observação</th></tr>
+  <tr><td>Computação (VM)</td><td>vm-minhas-tarefas, SKU <b>Standard_B2ats_v2</b> (2 vCPU, 1 GiB RAM)</td><td>Série B (burstable), ideal para cargas leves; custo de US$ 0,0132/hora.</td></tr>
+  <tr><td>Sistema operacional</td><td>Ubuntu Server 24.04 LTS (x64, Trusted Launch)</td><td>Distribuição Linux de suporte de longo prazo, sem custo de licença.</td></tr>
+  <tr><td>Armazenamento</td><td>Disco gerenciado SSD Standard de 30 GB</td><td>O banco SQLite persiste em /var/lib/minhas-tarefas/tasks.sqlite3, separado do código-fonte.</td></tr>
+  <tr><td>Rede</td><td>VNet vnet-chilecentral-1, sub-rede snet-chilecentral-1, IP público 57.156.68.206, NSG com portas 80 e 22</td><td>O NSG filtra o tráfego: apenas HTTP e SSH chegam à VM.</td></tr>
+  <tr><td>Região</td><td>Chile Central</td><td>Região permitida pela assinatura de estudante e a mais próxima do Brasil, reduzindo a latência.</td></tr>
+  <tr><td>Processo</td><td>Serviço systemd minhas-tarefas.service</td><td>Inicialização automática no boot, reinício em falhas e execução da porta 80 sem root.</td></tr>
+  <tr><td>Linguagem</td><td>TypeScript 5 executado pelo runtime Bun 1.4</td><td>Sem dependências externas de execução; servidor e banco usam módulos nativos.</td></tr>
+</table>
+<p class="tabcaption"><b>Tabela 3</b>. Elementos de nuvem provisionados.</p>
+<p><b>Computação.</b> A máquina virtual é o elemento central de IaaS (Infraestrutura como Serviço): em vez de comprar hardware, alocou-se uma VM sob demanda. O <i>SKU</i> (Stock Keeping Unit) <code>Standard_B2ats_v2</code> identifica o tamanho da instância na série B, com 2 vCPUs e 1 GiB de memória. Tamanhos da série B são <i>burstable</i>: operam com baixo consumo contínuo de CPU e acumulam créditos para picos, perfil adequado para uma API de pequeno volume, cuja ocupação real de memória ficou em torno de 50 MB.</p>
+<p><b>Armazenamento.</b> O disco do sistema é um <i>managed disk</i> SSD Standard de 30 GB, com replicação local (LRS). Ele hospeda o sistema operacional, o código em <code>/opt/minhas-tarefas</code> e o banco de dados: o SQLite grava em arquivo único, mantido fora do diretório do código em <code>/var/lib/minhas-tarefas/</code>. Essa separação entre aplicação e dados persiste mesmo com reinícios ou reimplantações da aplicação.</p>
+<p><b>Rede.</b> A VM está em uma rede virtual privada (VNet) com sub-rede dedicada, exposta à internet por um endereço IP público. O Grupo de Segurança de Rede atua como firewall stateful: apenas as portas 80 (HTTP, para a API e o dashboard) e 22 (SSH, para administração) estão liberadas; todo o restante do tráfego é descartado. Essa é a superfície mínima de exposição necessária para o funcionamento do trabalho.</p>
+<p><b>Região.</b> A região Chile Central foi escolhida entre as cinco permitidas pela política da assinatura Azure for Students (detalhes na seção 12) por ser a única nas Américas e, portanto, a de menor latência para acesso a partir do Brasil.</p>
+<p class="noindent">Os custos estimados do ambiente, com a VM ligada ininterruptamente, são:</p>
+<table>
+  <tr><th style="width:40%">Recurso</th><th style="width:30%">Custo mensal estimado (730 h)</th><th>Observação</th></tr>
+  <tr><td>VM Standard_B2ats_v2 (Linux)</td><td>US$ 9,64</td><td>US$ 0,0132 por hora ligada.</td></tr>
+  <tr><td>Disco gerenciado SSD Standard 30 GB</td><td>≈ US$ 4,80</td><td>Cobra mesmo com VM desalocada (mantém os dados).</td></tr>
+  <tr><td>Endereço IP público</td><td>≈ US$ 3,65</td><td>US$ 0,005 por hora alocado.</td></tr>
+  <tr><td><b>Total estimado</b></td><td><b>≈ US$ 18</b></td><td>Coberto pelos US$ 100 de crédito do Azure for Students.</td></tr>
+</table>
+<p class="tabcaption"><b>Tabela 4</b>. Custos estimados do ambiente em nuvem (valores aproximados).</p>
+<p>Para economizar crédito, a VM pode ser <i>desalocada</i> (comando Stop no portal) nos períodos em que não está em uso: nesse estado não há cobrança de computação, restando apenas o custo do disco. Ao religá-la, o serviço systemd sobe a API automaticamente e o banco de dados permanece intacto.</p>
+<p><b>Segurança e prevenção (DevSecOps).</b> Práticas de prevenção foram integradas do desenvolvimento à operação. Na aplicação: validação de entrada com lista branca de campos (evita injeção e atribuição em massa), consultas SQL parametrizadas, exclusão protegida por confirmação e limite de tamanho no corpo das requisições. Na infraestrutura: autenticação SSH somente por chave, NSG com superfície mínima (apenas portas 80 e 22), serviço executando sem privilégios de root (systemd com capacidade restrita CAP_NET_BIND_SERVICE) e banco em partição separada do código. No processo: provisionamento automatizado por script versionado, testes automatizados no fluxo de desenvolvimento e evidências documentadas, tornando todo o ciclo auditável e reproduzível.</p>
+</div>
+<div class="secao">
+<h2>8 HOSPEDAGEM DE FIM A FIM: PASSO A PASSO</h2>
+<p>A hospedagem foi realizada integralmente pelo portal do Azure, na assinatura Azure for Students, e complementada por provisionamento automatizado via SSH. O passo a passo executado foi:</p>
+<ol>
+  <li>Criação do grupo de recursos <code>rg-minhas-tarefas</code>, que agrupa todos os recursos do trabalho;</li>
+  <li>Criação da máquina virtual <code>vm-minhas-tarefas</code> na região Chile Central, com imagem Ubuntu Server 24.04 LTS e tamanho Standard_B2ats_v2, autenticação por chave SSH (par de chaves <code>vm-minhas-tarefas_key</code>) e portas de entrada HTTP (80) e SSH (22) liberadas;</li>
+  <li>Configuração do disco do sistema como SSD Standard de 30 GB (tipo StandardSSD_LRS);</li>
+  <li>Validação e implantação: o portal provisionou VM, disco, rede virtual, IP público e NSG em cerca de dois minutos, e o par de chaves foi baixado em formato PEM;</li>
+  <li>Provisionamento por SSH com o script <code>deploy/provision.sh</code>, que em um único comando: instala o runtime Bun na VM, copia o código da aplicação para <code>/opt/minhas-tarefas</code>, prepara o diretório de dados <code>/var/lib/minhas-tarefas</code>, instala o serviço <code>minhas-tarefas.service</code> no systemd e executa os testes de saúde;</li>
+  <li>Validação de ponta a ponta: consultas à API a partir da máquina do autor, pela internet, até o endereço público da VM.</li>
+</ol>
+<figure><img src="../evidence/02-formulario-criacao-vm.png" alt="Formulário de criação da VM"></figure>
+<p class="figcaption"><b>Figura 4</b>. Formulário de criação da máquina virtual no portal Azure.</p>
+<figure><img src="../evidence/04-vm-overview.png" alt="Overview da VM"></figure>
+<p class="figcaption"><b>Figura 5</b>. Visão geral da VM em execução, com IP público e região visíveis.</p>
+</div>
+
+<div class="secao">
+<h2>9 OPERAÇÃO EM PRODUÇÃO</h2>
+<p>Após o provisionamento, a API passou a responder de ponta a ponta no endereço <code>http://57.156.68.206</code>, acessível de qualquer rede. O dashboard em <code>/</code> consolida os indicadores do banco em tempo real, e os endpoints REST responderam corretamente a todas as operações testadas pela internet: criação (201), atualização (200), exclusão protegida (409 sem confirmação e 204 com <code>?confirm=true</code>), consultas com filtro, painel de indicadores e health check.</p>
+<figure><img src="../evidence/05-dashboard-navegador.png" alt="Dashboard no navegador"></figure>
+<p class="figcaption"><b>Figura 6</b>. Dashboard da aplicação em produção, acessado pela internet (http://57.156.68.206).</p>
+<figure><img src="../evidence/07-api-tasks-json.png" alt="JSON da API"></figure>
+<p class="figcaption"><b>Figura 7</b>. Endpoint GET /api/tasks respondendo em JSON direto do navegador.</p>
+</div>
+<div class="secao">
+<h2>10 EVIDÊNCIAS DOS ELEMENTOS DE NUVEM NO PORTAL</h2>
+<p>As capturas a seguir comprovam os elementos de nuvem descritos na seção 7: as regras de entrada do NSG, com as portas 80 e 22, e a topologia de rede completa criada pelo Azure para o trabalho (VNet, sub-rede, interface de rede e IP público). As demais evidências, incluindo configurações detalhadas da VM e da rede, estão na pasta <code>evidence/</code> do repositório.</p>
+<figure><img src="../evidence/11-vm-rede-nsg.png" alt="Rede e NSG"></figure>
+<p class="figcaption"><b>Figura 8</b>. Configurações de rede da VM: portas 80 e 22 liberadas no NSG.</p>
+<figure><img src="../evidence/12-vm-topologia-rede.png" alt="Topologia de rede"></figure>
+<p class="figcaption"><b>Figura 9</b>. Topologia da rede criada: VNet vnet-chilecentral-1, sub-rede e IP público.</p>
+</div>
+
+<div class="secao">
+<h2>11 TESTES AUTOMATIZADOS</h2>
+<p>O projeto possui uma suíte de testes automatizados executada com o comando <code>bun test</code>. Os testes de integração sobem um servidor real em porta aleatória com banco SQLite em diretório temporário (descartado ao final) e exercitam a API por HTTP, e testes de unidade validam diretamente as regras de validação de dados. Resultado da última execução: <b>19 testes aprovados, 0 falhas, 41 asserções</b>.</p>
+<p class="noindent">A cobertura inclui:</p>
+<ul>
+  <li>Semeadura das três tarefas de demonstração no primeiro início;</li>
+  <li>CRUD completo por HTTP real: criação (201), consulta por identificador, atualização parcial e exclusão;</li>
+  <li>Exclusão protegida: 409 sem confirmação e 204 com <code>?confirm=true</code>;</li>
+  <li>Validações: título obrigatório, status e prioridade restritos, formato de data, corpo inválido;</li>
+  <li>Lista branca de campos (campos não permitidos são descartados, evitando mass assignment);</li>
+  <li>Rotas inexistentes respondendo 404 em JSON; painel de indicadores; dashboard HTML servido em /.</li>
+</ul>
+</div>
+
+<div class="secao">
+<h2>12 PROBLEMAS ENFRENTADOS E RESOLUÇÃO (TROUBLESHOOTING)</h2>
+<p>Dois problemas reais de nuvem foram enfrentados durante a hospedagem. Primeiro, nos Estados Unidos, os tamanhos recomendados de VM apareciam como indisponíveis para a assinatura (<code>NotAvailableForSubscription</code>) e a implantação no East US falhou com <code>RequestDisallowedByAzure</code>: a assinatura Azure for Students aplica a política <i>Allowed resource deployment regions</i>, que restringe a criação de recursos a um conjunto específico de regiões, variável por assinatura.</p>
+<p>A resolução veio pela própria governança do Azure: em <i>Policy → Assignments</i>, a atribuição da política expõe o parâmetro <i>listOfAllowedLocations</i> com a lista exata de regiões liberadas. No caso desta assinatura, apenas cinco regiões eram permitidas (Bélgica, Norte da Itália, Chile, França e Espanha) e nenhuma delas nos Estados Unidos ou no Brasil. A região Chile Central foi escolhida por ser a única nas Américas, minimizando a latência a partir do Brasil. Com a região correta, o tamanho B2ats_v2 apareceu disponível e a implantação foi concluída sem erros.</p>
+<figure><img src="../evidence/01-policy-regioes-permitidas.png" alt="Política de regiões permitidas"></figure>
+<p class="figcaption"><b>Figura 10</b>. Política de regiões permitidas da assinatura, consultada em Policy → Assignments.</p>
+<p>O episódio ilustra um aspecto importante de nuvem pública: as assinaturas patrocinadas (estudantis) têm restrições de governança próprias, e o diagnóstico correto exige ler a política aplicada em vez de tentar regiões ao acaso.</p>
+</div>
+
+<div class="secao">
+<h2>13 CONCLUSÃO</h2>
+<p>O trabalho cumpriu integralmente os objetivos propostos. A API REST de tarefas foi desenvolvida em TypeScript com o runtime Bun e banco de dados SQLite, sem dependências externas de execução; possui operações CRUD completas, validação de dados, exclusão protegida por confirmação, dashboard web e 19 testes automatizados aprovados. A hospedagem de fim a fim foi realizada em uma máquina virtual Azure (SKU Standard_B2ats_v2, região Chile Central), exposta à internet por IP público e protegida por NSG, com o serviço gerenciado pelo systemd e o banco persistindo em disco gerenciado separado do código.</p>
+<p>Além do resultado funcional, com a API respondendo de qualquer lugar em http://57.156.68.206, o percurso proporcionou experiência prática com os elementos centrais da computação em nuvem: escolha de SKU com base em preço e capacidade, armazenamento em disco gerenciado, configuração de rede e segurança, economia por desalocação e o diagnóstico de restrições de governança da assinatura, resolvido com base na documentação oficial. O conjunto final de código, testes, scripts de provisionamento, evidências e relatório está versionado em repositório público no GitHub, servindo de registro completo e reproduzível do trabalho.</p>
+</div>
+
+<div class="secao">
+<h2>REFERÊNCIAS</h2>
+<p class="noindent">POPOVICI, Eduardo. <b>minha-frota</b>: material didático da disciplina. Disponível em: https://github.com/edupopov/minha-frota. Acesso em: out. 2026.</p>
+<p class="noindent">BUN. <b>Bun Documentation</b>. Disponível em: https://bun.com/docs. Acesso em: out. 2026.</p>
+<p class="noindent">SQLITE. <b>SQLite Documentation</b>. Disponível em: https://www.sqlite.org/docs.html. Acesso em: out. 2026.</p>
+<p class="noindent">MICROSOFT. <b>Azure Virtual Machines: documentação</b>. Disponível em: https://learn.microsoft.com/azure/virtual-machines/. Acesso em: out. 2026.</p>
+<p class="noindent">MICROSOFT. <b>Azure for Students</b>. Disponível em: https://azure.microsoft.com/free/students/. Acesso em: out. 2026.</p>
+<p class="noindent">MICROSOFT. <b>Azure Retail Prices API</b>. Disponível em: https://prices.azure.com. Acesso em: out. 2026.</p>
+</div>
+
+</body>
+</html>

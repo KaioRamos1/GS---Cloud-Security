@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Minhas Tarefas — API com SQLite</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f7fb;color:#14213d;font:16px "Segoe UI",Arial,sans-serif}
+.top{background:#102a4c;color:#fff;padding:26px max(6vw,24px)}
+h1{margin:0;font-size:30px}
+.top p{opacity:.8;margin:7px 0 0}
+.main{max-width:1100px;margin:26px auto;padding:0 24px}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 4px 18px #16325c14}
+.label{color:#637490;font-size:13px}
+.number{font-size:25px;font-weight:700;margin-top:7px}
+.tasks{display:grid;gap:16px}
+.task{border-left:5px solid #1683ff}
+.task h3{margin:0 0 10px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.meta{color:#526680;font-size:14px;margin:5px 0}
+button{border:0;border-radius:8px;background:#087cff;color:#fff;font-weight:600;padding:11px 15px;cursor:pointer}
+button:hover{background:#0066d7}
+button.danger{background:#b42318;padding:6px 10px;font-size:13px}
+button.danger:hover{background:#8f1c14}
+form{display:grid;grid-template-columns:2fr 2fr 1fr 1fr auto;gap:10px;margin:20px 0}
+input,select{border:1px solid #cbd7e7;border-radius:8px;padding:10px;font:inherit}
+.notice{min-height:24px;color:#16733a;font-weight:600}
+.badge{border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;color:#fff}
+.alta{background:#b42318}.media{background:#d97706}.baixa{background:#16733a}
+.status-pendente{color:#087cff;font-weight:600}
+.status-concluida{color:#16733a;font-weight:600}
+.status-cancelada{color:#98a2b3;font-weight:600}
+@media(max-width:720px){.summary,form{grid-template-columns:1fr}.main{padding:0 15px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Minhas Tarefas</h1>
+  <p>API REST com SQLite — TypeScript + Bun, hospedada em VM Azure.</p>
+</header>
+<main class="main">
+  <section class="summary">
+    <article class="card"><div class="label">Total de tarefas</div><div class="number" id="total">—</div></article>
+    <article class="card"><div class="label">Pendentes</div><div class="number" id="pendentes">—</div></article>
+    <article class="card"><div class="label">Concluídas</div><div class="number" id="concluidas">—</div></article>
+  </section>
+  <button id="refresh" type="button">Atualizar dados</button>
+  <p class="notice" id="notice" role="status"></p>
+  <h2>Tarefas</h2>
+  <section class="tasks" id="tasks" aria-live="polite"></section>
+  <h2>Adicionar tarefa</h2>
+  <form id="task-form">
+    <input id="title" required placeholder="Título" value="Tarefa de teste">
+    <input id="description" placeholder="Descrição (opcional)">
+    <select id="priority" aria-label="Prioridade">
+      <option value="alta">Prioridade alta</option>
+      <option value="media" selected>Prioridade média</option>
+      <option value="baixa">Prioridade baixa</option>
+    </select>
+    <input id="due_date" type="date">
+    <button type="submit">Cadastrar</button>
+  </form>
+</main>
+<script>
+const el=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmtDate=s=>s?s.split("-").reverse().join("/"):"—";
+async function load(){
+  try{
+    const [d,t]=await Promise.all([fetch("/api/dashboard").then(r=>r.json()),fetch("/api/tasks").then(r=>r.json())]);
+    el("total").textContent=d.data.total;
+    el("pendentes").textContent=d.data.pendentes;
+    el("concluidas").textContent=d.data.concluidas;
+    el("tasks").innerHTML=t.data.map(x=>`<article class="card task"><h3>${esc(x.title)}<button class="danger" data-id="${x.id}" type="button">Excluir</button></h3><div class="meta">${esc(x.description||"Sem descrição")}</div><div class="meta">Prioridade: <span class="badge ${esc(x.priority)}">${esc(x.priority)}</span> · <span class="status-${esc(x.status)}">Status: ${esc(x.status)}</span> · Prazo: ${fmtDate(x.due_date)}</div></article>`).join("");
+    el("notice").textContent="Dados atualizados.";
+    el("notice").style.color="#16733a";
+  }catch(e){
+    el("notice").textContent="Não foi possível consultar a API.";
+    el("notice").style.color="#b42318";
+  }
+}
+el("refresh").onclick=load;
+el("tasks").addEventListener("click",async e=>{
+  const b=e.target.closest("button.danger");
+  if(!b)return;
+  const r=await fetch(`/api/tasks/${b.dataset.id}?confirm=true`,{method:"DELETE"});
+  el("notice").textContent=r.status===204?"Tarefa excluída com sucesso.":"Falha ao excluir a tarefa.";
+  el("notice").style.color=r.status===204?"#16733a":"#b42318";
+  load();
+});
+el("task-form").onsubmit=async e=>{
+  e.preventDefault();
+  const p={title:el("title").value,description:el("description").value,priority:el("priority").value};
+  if(el("due_date").value)p.due_date=el("due_date").value;
+  const r=await fetch("/api/tasks",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){
+    el("notice").textContent=j.error?.message||"Falha ao cadastrar.";
+    el("notice").style.color="#b42318";
+    return;
+  }
+  el("notice").style.color="#16733a";
+  el("notice").textContent="Tarefa cadastrada com sucesso.";
+  e.target.reset();
+  load();
+};
+load();
+</script>
+</body>
+</html>

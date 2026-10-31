@@ -1,2 +1,0 @@
-# Servidor para a VM Linux. O modo local usa somente a biblioteca padrao.
-gunicorn==26.2.0; sys_platform != 'win32'

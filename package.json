@@ -1,0 +1,14 @@
+{
+  "name": "minhas-tarefas",
+  "version": "1.0.0",
+  "description": "API REST de tarefas (CRUD) com SQLite nativo (bun:sqlite), TypeScript e Bun, hospedada em VM Azure",
+  "type": "module",
+  "scripts": {
+    "start": "bun src/index.ts",
+    "dev": "bun --hot src/index.ts",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
